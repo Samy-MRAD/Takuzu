@@ -2,37 +2,48 @@ library(shiny)
 
 ### LISTE DE FONCTIONS ###
 
-# Fonction pour corriger la grille selon la règle "pas plus de 2 signes consécutifs identiques"
-comptage_elt <- function(grille, nRows, nCols){
-  S_row <- numeric(nRows)
-  S_col <- numeric(nCols)
+# Fonction pour générer une grille de Takuzu valide pour que le code efface ensuite un
+# nombre de cases en fonction de la difficulté
+generer_grille_valide <- function(nRows, nCols) {
+  grille <- matrix("", nrow = nRows, ncol = nCols)
+  
   for (i in 1:nRows) {
-    S_row[i] <- colSums(i)
+    zeros <- 0
+    ones <- 0
+    for (j in 1:nCols) {
+      possible_values <- c("0", "1")
+      if (j > 2 && grille[i, j-1] == grille[i, j-2]) {
+        possible_values <- setdiff(possible_values, grille[i, j-1])
+      }
+      if (i > 2 && grille[i-1, j] == grille[i-2, j]) {
+        possible_values <- setdiff(possible_values, grille[i-1, j])
+      }
+      
+      # Assurer une répartition égale des 0 et 1
+      if (zeros >= nCols / 2) {
+        possible_values <- "1"
+      } else if (ones >= nCols / 2) {
+        possible_values <- "0"
+      }
+      
+      if (length(possible_values) > 0) {
+        grille[i, j] <- sample(possible_values, 1)
+        if (grille[i, j] == "0") {
+          zeros <- zeros + 1
+        } else {
+          ones <- ones + 1
+        }
+      }
+    }
   }
-  for (j in 1:nCols) {
-    S_col[j] <- rowSums(j)
-  }
-  return(S_row, S_col)
+  return(grille)
 }
 
-
-corriger_grille <- function(grille, nRows, nCols) {
-  for (i in 1:nRows) {
-    for (j in 3:nCols) {
-      if (grille[i, j] != "" && grille[i, j] == grille[i, j-1] && grille[i, j] == grille[i, j-2]) {
-        grille[i, j] <- sample(setdiff(c("0", "1"), grille[i, j]), 1)
-      }
-    }
-  }
-  
-  for (j in 1:nCols) {
-    for (i in 3:nRows) {
-      if (grille[i, j] != "" && grille[i, j] == grille[i-1, j] && grille[i, j] == grille[i-2, j]) {
-        grille[i, j] <- sample(setdiff(c("0", "1"), grille[i, j]), 1)
-      }
-    }
-  
-  }
+# Fonction pour masquer un nombre donné de cases
+masquer_cases <- function(grille, nb_vide) {
+  total_buttons <- length(grille)
+  indices <- sample(1:total_buttons, nb_vide)
+  grille[indices] <- ""
   return(grille)
 }
 
@@ -55,11 +66,11 @@ server <- function(input, output, session) {
   nCols <- 8
   total_buttons <- nRows * nCols
   
-  # Nombre de cases à remplir selon la difficulté
-  nb_cases_remplies <- list(
-    facile = 28,
-    moyen = 22,
-    difficile = 16
+  # Nombre de cases à masquer selon la difficulté
+  nb_cases_vides <- list(
+    facile = total_buttons - 38,
+    moyen = total_buttons - 30,
+    difficile = total_buttons - 22
   )
   
   # États possibles : "", "0" ou "1"
@@ -69,16 +80,8 @@ server <- function(input, output, session) {
   
   observeEvent(input$launch, {
     niveau <- input$diff
-    grille <- matrix("", nrow = nRows, ncol = nCols)
-    indices <- sample(1:total_buttons, nb_cases_remplies[[niveau]])
-    
-    for (idx in indices) {
-      row <- ((idx - 1) %/% nCols) + 1
-      col <- ((idx - 1) %% nCols) + 1
-      grille[row, col] <- sample(c("0", "1"), 1)  # Évite de remplir avec "" au départ
-    }
-    
-    grille <- corriger_grille(grille, nRows, nCols)
+    grille <- generer_grille_valide(nRows, nCols)
+    grille <- masquer_cases(grille, nb_cases_vides[[niveau]])
     state$values <- grille
   })
   
@@ -104,18 +107,16 @@ server <- function(input, output, session) {
 
 shinyApp(ui = ui, server = server)
 
-
-
 ### PACKAGE ###
 # Fonctions :
-             # Générer la grille 
-             # Corriger la grille
-             # Donner un indice au joueur
-             # Vérifier la grille pour le joueur 
-             # Alerter le joueur quand il fait un "move" impossible
+# Générer la grille 
+# Corriger la grille
+# Donner un indice au joueur
+# Vérifier la grille pour le joueur 
+# Alerter le joueur quand il fait un "move" impossible
 
 # Library :
-             # Shiny et c'est tout normalement
+# Shiny et c'est tout normalement
 
 
 # Version finale : le code génère au préalable une grille remplie qui respecte les règles
