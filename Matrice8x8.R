@@ -53,11 +53,11 @@ ui <- fluidPage(
     radioButtons('diff', "Choisissez un niveau de difficulté :", choices = c("facile", "moyen", "difficile")),
     actionButton('launch', "Lancez le niveau")
   ),
+  actionButton("help","Révéler une case"),
   
   tags$style(HTML(".btn-grid { display: grid; grid-template-columns: repeat(8, 50px); gap: 2px; justify-content: center; }
                   .btn-grid button { width: 50px; height: 50px; font-size: 12px; }
                   .btn_custom { width: 50px; height: 50px; font-size: 18px; font-weight: bold; text-align: center; vertical-align: middle; border: 2px solid black; border-radius: 5px; }")),
-  
   uiOutput("matrice_boutons")
 )
 
@@ -77,11 +77,12 @@ server <- function(input, output, session) {
   states <- c("", "0", "1")
   
   state <- reactiveValues(values = matrix(rep("", total_buttons), nrow = nRows, ncol = nCols))
-  
+  solution <- reactiveValues(values = NULL)
   observeEvent(input$launch, {
     niveau <- input$diff
-    grille <- generer_grille_valide(nRows, nCols)
-    grille <- masquer_cases(grille, nb_cases_vides[[niveau]])
+    grille_complet <- generer_grille_valide(nRows, nCols)
+    solution$values <- grille_complet
+    grille <- masquer_cases(grille_complet, nb_cases_vides[[niveau]])
     state$values <- grille
   })
   
@@ -102,6 +103,19 @@ server <- function(input, output, session) {
       next_index <- (current_index %% length(states)) + 1
       state$values[row, col] <- states[next_index]
     })
+  })
+  observeEvent(input$help,{
+    #Chercher les cases vide 
+    empty_indices <- which(state$values == "", arr.ind = TRUE)
+    #Si il reste des cases vides 
+    if (nrow(empty_indices) > 0) {
+      # Choisir une case vide au hasard
+      idx <- empty_indices[sample(1:nrow(empty_indices), 1), ]
+      row <- idx[1]
+      col <- idx[2]
+          # Remplir cette case avec la valeur correcte qu'on a stockée dans solution
+    state$values[row, col] <- solution$values[row, col]
+    }
   })
 }
 
@@ -127,4 +141,3 @@ shinyApp(ui = ui, server = server)
 # dernier recours, il faudrait créer une fonction qui donne une alerte à l'utilisateur si 
 # son coup est faux OU une fonction qui permette à l'utilisateur à tout instant de vérifier 
 # si sa grille respecte les règles.
-
