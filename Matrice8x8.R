@@ -1,4 +1,5 @@
 library(shiny)
+library(shinyjs)
 
 ### LISTE DE FONCTIONS ###
 
@@ -48,12 +49,13 @@ masquer_cases <- function(grille, nb_vide) {
 }
 
 ui <- fluidPage(
+  useShinyjs(),  # Activer shinyjs
   titlePanel("Takuzu 8x8"),
   sidebarPanel(
     radioButtons('diff', "Choisissez un niveau de difficulté :", choices = c("facile", "moyen", "difficile")),
-    actionButton('launch', "Lancez le niveau")
+    actionButton('launch', "Lancez le niveau"),
+    actionButton("help","Révéler une case", disabled = TRUE)  # Désactivé au départ
   ),
-  actionButton("help","Révéler une case"),
   
   tags$style(HTML(".btn-grid { display: grid; grid-template-columns: repeat(8, 50px); gap: 2px; justify-content: center; }
                   .btn-grid button { width: 50px; height: 50px; font-size: 12px; }
@@ -66,24 +68,26 @@ server <- function(input, output, session) {
   nCols <- 8
   total_buttons <- nRows * nCols
   
-  # Nombre de cases à masquer selon la difficulté
   nb_cases_vides <- list(
     facile = total_buttons - 38,
     moyen = total_buttons - 30,
     difficile = total_buttons - 22
   )
   
-  # États possibles : "", "0" ou "1"
   states <- c("", "0", "1")
   
   state <- reactiveValues(values = matrix(rep("", total_buttons), nrow = nRows, ncol = nCols))
   solution <- reactiveValues(values = NULL)
+  
   observeEvent(input$launch, {
     niveau <- input$diff
-    grille_complet <- generer_grille_valide(nRows, nCols)
-    solution$values <- grille_complet
-    grille <- masquer_cases(grille_complet, nb_cases_vides[[niveau]])
+    grille_completee <- generer_grille_valide(nRows, nCols)
+    solution$values <- grille_completee
+    grille <- masquer_cases(grille_completee, nb_cases_vides[[niveau]])
     state$values <- grille
+    
+    # Activer le bouton "Révéler une case" après le lancement du niveau
+    enable("help")
   })
   
   output$matrice_boutons <- renderUI({
@@ -104,17 +108,14 @@ server <- function(input, output, session) {
       state$values[row, col] <- states[next_index]
     })
   })
-  observeEvent(input$help,{
-    #Chercher les cases vide 
+  
+  observeEvent(input$help, {
     empty_indices <- which(state$values == "", arr.ind = TRUE)
-    #Si il reste des cases vides 
     if (nrow(empty_indices) > 0) {
-      # Choisir une case vide au hasard
       idx <- empty_indices[sample(1:nrow(empty_indices), 1), ]
       row <- idx[1]
       col <- idx[2]
-          # Remplir cette case avec la valeur correcte qu'on a stockée dans solution
-    state$values[row, col] <- solution$values[row, col]
+      state$values[row, col] <- solution$values[row, col]
     }
   })
 }
