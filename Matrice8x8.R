@@ -54,7 +54,8 @@ ui <- fluidPage(
   sidebarPanel(
     radioButtons('diff', "Choisissez un niveau de difficulté :", choices = c("facile", "moyen", "difficile")),
     actionButton('launch', "Lancez le niveau"),
-    actionButton("help","Révéler une case", disabled = TRUE)  # Désactivé au départ
+    actionButton("help","Révéler une case", disabled = TRUE),  # Désactivé au départ
+    actionButton("verif","Vérifier la grille",disabled = TRUE)
   ),
   
   tags$style(HTML(".btn-grid { display: grid; grid-template-columns: repeat(8, 50px); gap: 2px; justify-content: center; }
@@ -88,6 +89,7 @@ server <- function(input, output, session) {
     
     # Activer le bouton "Révéler une case" après le lancement du niveau
     enable("help")
+    enable("verif")
   })
   
   output$matrice_boutons <- renderUI({
@@ -116,6 +118,14 @@ server <- function(input, output, session) {
       row <- idx[1]
       col <- idx[2]
       state$values[row, col] <- solution$values[row, col]
+    }
+  })
+  
+  observeEvent(input$verif, {
+    if (all(state$values == solution$values)) {
+      showModal(modalDialog("Bravo ! Grille correcte ", easyClose = TRUE))
+    } else {
+      showModal(modalDialog("Il ya des erreurs", easyClose = TRUE))
     }
   })
 }
