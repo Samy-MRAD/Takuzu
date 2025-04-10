@@ -122,12 +122,18 @@ server <- function(input, output, session) {
   })
   
   observeEvent(input$verif, {
-    if (all(state$values == solution$values)) {
-      showModal(modalDialog("Bravo ! Grille correcte ", easyClose = TRUE))
+    user_grid <- state$values
+    sol_grid <- solution$values
+    # Créer une matrice booléenne TRUE si la case remplie est correcte ou vide
+    cases_ok <- (user_grid == sol_grid) | (user_grid == "")
+    
+    if (all(cases_ok)) {
+      showModal(modalDialog("Grille correcte", easyClose = TRUE))
     } else {
-      showModal(modalDialog("Il ya des erreurs", easyClose = TRUE))
+      showModal(modalDialog("Des erreurs sont présentes dans la grille.", easyClose = TRUE))
     }
   })
+  
 }
 
 shinyApp(ui = ui, server = server)
