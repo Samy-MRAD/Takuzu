@@ -1,21 +1,21 @@
 Package: Takuzu
 Type: Package
-Title: What the Package Does (Title Case)
+Title: Ce package a pour but de permettre à l'utilisateur de jouer au jeu Takuzu.
 Version: 0.1.0
 Authors@R: c(
     person(
-      "Jane", "Doe",
-      email = "jane@example.com",
-      role = c("aut", "cre")
+      "Condamy Fabian", "Samy M'Rad",
+      email = "fabiancondamy@gmail.com",
+      role = c("aut", "aut")
     )
   )
-Description: More about what it does (maybe more than one line).
-    Continuation lines should be indented.
+Description: Le package permet à l'utilisateur de générer une grille de Takuzu avec plusieurs niveaux de difficulté, le joueur peut également révéler des cases et vérifier si ses coups sont bons.
 License: What license is it under?
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
 Imports:
+    devtools,
     shiny,
     shinyjs

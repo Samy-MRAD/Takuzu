@@ -14,6 +14,6 @@ Ce package R propose une application Shiny pour jouer au jeu de logique **Takuzu
 install.packages(c("devtools", "shiny", "shinyjs"))
 
 4. Utiliser l'application :
-devtools::document()  # Génère la documentation et met à jour NAMESPACE
-devtools::load_all()
-run_app()
+renv::restore() # pour recharger l'ensemble des packages déjà installés
+devtools::load_all() # pour charger l'intégralité du package 
+run_app() # pour lancer l'application
