@@ -15,8 +15,10 @@ app_ui <- function() {
       actionButton("verif","Vérifier la grille", disabled = TRUE)
     ),
     tags$style(HTML(".btn-grid { display: grid; grid-template-columns: repeat(8, 50px); gap: 2px; justify-content: center; }
-                     .btn-grid button { width: 50px; height: 50px; font-size: 12px; }
-                     .btn_custom { width: 50px; height: 50px; font-size: 18px; font-weight: bold; text-align: center; vertical-align: middle; border: 2px solid black; border-radius: 5px; }")),
+                 .btn-grid button { width: 50px; height: 50px; font-size: 12px; }
+                 .btn_custom { width: 50px; height: 50px; font-size: 18px; font-weight: bold; text-align: center; vertical-align: middle; border: 2px solid black; border-radius: 5px; }
+                 .btn_custom.disabled { background-color: lightgray; color: darkgray; cursor: not-allowed; }
+                 .btn_error { background-color: red; color: white; }")),
     uiOutput("matrice_boutons")
   )
 }

@@ -1,16 +1,13 @@
 Package: Takuzu
 Type: Package
-Title: Ce package a pour but de permettre à l'utilisateur de jouer au jeu Takuzu.
+Title: Package pour jouer au jeu Takuzu
 Version: 0.1.0
 Authors@R: c(
-    person(
-      "Condamy Fabian", "Samy M'Rad",
-      email = "fabiancondamy@gmail.com",
-      role = c("aut", "aut")
-    )
-  )
-Description: Le package permet à l'utilisateur de générer une grille de Takuzu avec plusieurs niveaux de difficulté, le joueur peut également révéler des cases et vérifier si ses coups sont bons.
-License: What license is it under?
+    person("Fabian", "Condamy", email = "fabiancondamy@gmail.com", role = c("aut", "cre")),
+    person("Samy", "M'Rad", role = "aut"))
+Description: Ce package permet à l'utilisateur de jouer au jeu Takuzu. Il peut choisir
+    un niveau de difficulté, révéler des cases et vérifier si la solution est correcte.
+License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)

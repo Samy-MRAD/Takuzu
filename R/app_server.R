@@ -19,6 +19,7 @@ app_server <- function(input, output, session) {
 
   state <- reactiveValues(values = matrix(rep("", total_buttons), nrow = nRows, ncol = nCols))
   solution <- reactiveValues(values = NULL)
+  erreurs <- reactiveValues(indices = NULL)
 
   observeEvent(input$launch, {
     niveau <- input$diff
@@ -36,9 +37,31 @@ app_server <- function(input, output, session) {
     boutons <- lapply(1:total_buttons, function(i) {
       row <- ((i - 1) %/% nCols) + 1
       col <- ((i - 1) %% nCols) + 1
-      actionButton(inputId = paste0("bouton_", i), label = state$values[row, col], class = "btn_custom")
+
+      # Est-ce une case erronée ?
+      is_error <- !is.null(erreurs$indices) &&
+        any(apply(erreurs$indices, 1, function(ind) all(ind == c(row, col))))
+
+      bouton_class <- if (is_error) "btn_custom btn_error" else "btn_custom"
+
+      actionButton(inputId = paste0("bouton_", i),
+                   label = state$values[row, col],
+                   class = bouton_class)
     })
-    div(class = "btn-grid", boutons)
+    div(
+      class = "btn-grid",
+      boutons,
+      br(),
+      verbatimTextOutput("nb_erreurs")
+    )
+  })
+
+  output$nb_erreurs <- renderText({
+    if (!is.null(erreurs$indices)) {
+      paste0("Nombre de cases erronées : ", nrow(erreurs$indices))
+    } else {
+      ""
+    }
   })
 
   lapply(1:total_buttons, function(i) {
@@ -62,10 +85,14 @@ app_server <- function(input, output, session) {
   })
 
   observeEvent(input$verif, {
+    erreurs$indices <- NULL  # on vide les erreurs précédentes
+
     if (all(state$values == solution$values)) {
-      showModal(modalDialog("Bravo ! Grille correcte ", easyClose = TRUE))
+      showModal(modalDialog("Bravo, grille correcte !", easyClose = TRUE))
     } else {
-      showModal(modalDialog("Il ya des erreurs", easyClose = TRUE))
+      diff_matrix <- state$values != solution$values
+      erreurs$indices <- which(diff_matrix, arr.ind = TRUE)
+      showModal(modalDialog("Il y a des erreurs", easyClose = TRUE))
     }
   })
 }

@@ -1,1 +1,1 @@
-source("renv/activate.R")
+# source("renv/activate.R") désactivé pour le moment
