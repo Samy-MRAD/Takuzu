@@ -106,6 +106,17 @@ app_server <- function(input, output, session) {
     }
   })
 
+  #Affichage game over
+  observe({
+    if (!is.null(solution$values)) {
+      current <- state$values
+      # Vérifie que la grille est pleine (pas de cases vides)
+      if (all(current != "") && all(current == solution$values)) {
+        showModal(modalDialog("Bravo, grille complétée !", easyClose = TRUE))
+      }
+    }
+  })
+
   observeEvent(input$verif, {
     if (compteur_verif$remaining > 0) {
       erreurs$indices <- NULL  # on vide les erreurs précédentes
