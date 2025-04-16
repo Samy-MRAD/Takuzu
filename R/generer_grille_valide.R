@@ -10,37 +10,69 @@
 #' @return Une matrice `nRows` x `nCols` remplie de "0" et "1" (caractères).
 #'
 #' @export
-generer_grille_valide <- function(nRows, nCols) {
-  grille <- matrix("", nrow = nRows, ncol = nCols)
+generer_grille_valide <- function(nRows, nCols, max_essais = 1000) {
+  for (essai in 1:max_essais) {
+    grille <- matrix("", nrow = nRows, ncol = nCols)
+    ligne_ok <- TRUE
 
-  for (i in 1:nRows) {
-    zeros <- 0
-    ones <- 0
-    for (j in 1:nCols) {
-      possible_values <- c("0", "1")
-      if (j > 2 && grille[i, j-1] == grille[i, j-2]) {
-        possible_values <- setdiff(possible_values, grille[i, j-1])
-      }
-      if (i > 2 && grille[i-1, j] == grille[i-2, j]) {
-        possible_values <- setdiff(possible_values, grille[i-1, j])
-      }
+    for (i in 1:nRows) {
+      zeros <- 0
+      ones <- 0
+      ligne <- rep("", nCols)
 
-      # Assurer une répartition égale des 0 et 1
-      if (zeros >= nCols / 2) {
-        possible_values <- "1"
-      } else if (ones >= nCols / 2) {
-        possible_values <- "0"
-      }
+      for (j in 1:nCols) {
+        possible_values <- c("0", "1")
 
-      if (length(possible_values) > 0) {
-        grille[i, j] <- sample(possible_values, 1)
-        if (grille[i, j] == "0") {
-          zeros <- zeros + 1
-        } else {
-          ones <- ones + 1
+        # Éviter les triples horizontalement
+        if (j > 2 && ligne[j-1] == ligne[j-2]) {
+          possible_values <- setdiff(possible_values, ligne[j-1])
         }
+
+        # Éviter les triples verticalement
+        if (i > 2 && grille[i-1, j] == grille[i-2, j]) {
+          possible_values <- setdiff(possible_values, grille[i-1, j])
+        }
+
+        # Répartition équilibrée
+        if (zeros >= nCols / 2) {
+          possible_values <- setdiff(possible_values, "0")
+        }
+        if (ones >= nCols / 2) {
+          possible_values <- setdiff(possible_values, "1")
+        }
+
+        if (length(possible_values) == 0) {
+          ligne_ok <- FALSE
+          break
+        }
+
+        ligne[j] <- sample(possible_values, 1)
+        if (ligne[j] == "0") zeros <- zeros + 1
+        if (ligne[j] == "1") ones <- ones + 1
+      }
+
+      if (!ligne_ok) break
+
+      # Vérification unicité de la ligne
+      if (i > 1) {
+        lignes_existantes <- apply(grille[1:(i-1), , drop = FALSE], 1, paste, collapse = "")
+        if (paste(ligne, collapse = "") %in% lignes_existantes) {
+          ligne_ok <- FALSE
+          break
+        }
+      }
+
+      grille[i, ] <- ligne
+    }
+
+    # Vérification unicité des colonnes
+    if (ligne_ok) {
+      colonnes <- apply(grille, 2, paste, collapse = "")
+      if (!any(duplicated(colonnes))) {
+        return(grille)
       }
     }
   }
-  return(grille)
+
+  stop("Impossible de générer une grille valide après plusieurs essais.")
 }

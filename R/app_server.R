@@ -10,7 +10,7 @@ app_server <- function(input, output, session) {
   total_buttons <- nRows * nCols
 
   nb_cases_vides <- list(
-    facile = total_buttons - 38,
+    facile = total_buttons - 64,
     moyen = total_buttons - 30,
     difficile = total_buttons - 22
   )
