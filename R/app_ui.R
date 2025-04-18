@@ -47,13 +47,13 @@ app_ui <- function() {
       }
     ")),
 
-    titlePanel("🎮 Takuzu 8x8"),
+    titlePanel("Takuzu 8x8"),
 
     sidebarPanel(
       radioButtons('diff', "Choisissez un niveau de difficulté :", choices = c("facile", "moyen", "difficile")),
-      actionButton('launch', "🔁 Lancer le niveau"),
-      actionButton("help", "✨ Révéler une case", disabled = TRUE),
-      actionButton("verif", "✅ Vérifier la grille", disabled = TRUE)
+      actionButton('launch', "Lancer le niveau"),
+      actionButton("help", "Révéler une case", disabled = TRUE),
+      actionButton("verif", "Vérifier la grille", disabled = TRUE)
     ),
 
     uiOutput("matrice_boutons")
