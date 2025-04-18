@@ -61,19 +61,10 @@ app_server <- function(input, output, session) {
     })
     div(
       class = "btn-grid",
-      boutons,
-      br(),
-      verbatimTextOutput("nb_erreurs")
+      boutons
     )
   })
 
-  output$nb_erreurs <- renderText({
-    if (!is.null(erreurs$indices)) {
-      paste0("Nombre de cases erronées : ", nrow(erreurs$indices))
-    } else {
-      ""
-    }
-  })
 
   lapply(1:total_buttons, function(i) {
     observeEvent(input[[paste0("bouton_", i)]], {
