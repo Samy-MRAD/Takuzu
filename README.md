@@ -7,6 +7,7 @@ Ce package R propose une application Shiny pour jouer au jeu de logique **Takuzu
 - Des boutons de contrôle pour valider, recommencer ou dévoiler la solution
 - Une vérification automatique de la grille une fois complétée
 
+
 ## Règles du jeu
 
 Pour remplir la grille, le joueur doit suivre les règles suivantes :
@@ -15,8 +16,6 @@ Pour remplir la grille, le joueur doit suivre les règles suivantes :
 2. Le même nombre de 0 et de 1 dans chaque ligne et chaque colonne.
 3. Aucune ligne ou colonne identique à une autre.
 
-
-Ce package R propose une application Shiny pour jouer au jeu de logique **Takuzu** (aussi appelé Binairo), avec des grilles 8x8 générées dynamiquement.
 
 ## Installation et compilation du package
 
@@ -42,6 +41,7 @@ install.packages(c("devtools", "shiny", "shinyjs"))
 devtools::load_all()
 run_app()
 ```
+
 
 ## Contributeurs 
 - Samy M'RAD
