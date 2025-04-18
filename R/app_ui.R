@@ -7,18 +7,55 @@
 app_ui <- function() {
   fluidPage(
     useShinyjs(),
-    titlePanel("Takuzu 8x8"),
+    tags$style(HTML("
+      body {
+        background-color: #f8f9fa;
+        font-family: 'Segoe UI', sans-serif;
+      }
+      .btn-grid {
+        display: grid;
+        grid-template-columns: repeat(8, 50px);
+        gap: 5px;
+        justify-content: center;
+        margin-top: 20px;
+      }
+      .btn-grid button {
+        width: 50px;
+        height: 50px;
+        font-size: 18px;
+        font-weight: bold;
+        border-radius: 8px;
+      }
+      .btn_custom {
+        background-color: #ffffff;
+        color: #333333;
+        border: 2px solid #dee2e6;
+        transition: 0.2s;
+      }
+      .btn_custom:hover {
+        background-color: #e2e6ea;
+      }
+      .btn_custom.disabled {
+        background-color: #f1f1f1;
+        color: #999999;
+        border-color: #cccccc;
+      }
+      .btn_error {
+        background-color: #ff6b6b !important;
+        color: white !important;
+        border-color: #ff6b6b !important;
+      }
+    ")),
+
+    titlePanel("🎮 Takuzu 8x8"),
+
     sidebarPanel(
       radioButtons('diff', "Choisissez un niveau de difficulté :", choices = c("facile", "moyen", "difficile")),
-      actionButton('launch', "Lancez le niveau"),
-      actionButton("help","Révéler une case", disabled = TRUE),
-      actionButton("verif","Vérifier la grille", disabled = TRUE)
+      actionButton('launch', "🔁 Lancer le niveau"),
+      actionButton("help", "✨ Révéler une case", disabled = TRUE),
+      actionButton("verif", "✅ Vérifier la grille", disabled = TRUE)
     ),
-    tags$style(HTML(".btn-grid { display: grid; grid-template-columns: repeat(8, 50px); gap: 2px; justify-content: center; }
-                 .btn-grid button { width: 50px; height: 50px; font-size: 12px; }
-                 .btn_custom { width: 50px; height: 50px; font-size: 18px; font-weight: bold; text-align: center; vertical-align: middle; border: 2px solid black; border-radius: 5px; }
-                 .btn_custom.disabled { background-color: lightgray; color: darkgray; cursor: not-allowed; }
-                 .btn_error { background-color: red; color: white; }")),
+
     uiOutput("matrice_boutons")
   )
 }
