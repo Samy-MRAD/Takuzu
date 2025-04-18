@@ -4,7 +4,7 @@
 \alias{generer_grille_valide}
 \title{Génère une grille de Takuzu valide}
 \usage{
-generer_grille_valide(nRows, nCols)
+generer_grille_valide(nRows, nCols, max_essais = 1000)
 }
 \arguments{
 \item{nRows}{Nombre de lignes de la grille.}

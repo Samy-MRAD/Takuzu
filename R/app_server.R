@@ -49,14 +49,7 @@ app_server <- function(input, output, session) {
     # Cases fixes
     cases_fixes$indices <- which(grille != "", arr.ind = TRUE)
 
-    # modif du bouton lancer le niveau
-    if (!lancement_fait()) {
-      lancement_fait(TRUE)
-    } else {
-      updateActionButton(session, "launch", label = "Lancer un autre niveau")
-    }
-
-    # Et au premier clic, on peut aussi directement changer le label :
+    # Changement du nom de la case au premier clic
     if (!lancement_fait()) {
       lancement_fait(TRUE)
       updateActionButton(session, "launch", label = "Lancer un autre niveau")
@@ -105,7 +98,7 @@ app_server <- function(input, output, session) {
       boutons
     )
   })
-  # Au clic, passe à la valeur suivante
+  # Permet de cliquer sur les boutons de la grille pour changer les valeurs
   lapply(1:total_buttons, function(i) {
     observeEvent(input[[paste0("bouton_", i)]], {
       row <- ((i - 1) %/% nCols) + 1
@@ -114,6 +107,7 @@ app_server <- function(input, output, session) {
       # Ne rien faire si la case est fixe
       if (!is.null(state$fixed) && state$fixed[row, col]) return()
 
+      # au clic passe à la valeur suivante
       current_index <- which(states == state$values[row, col])
       next_index <- (current_index %% length(states)) + 1
       state$values[row, col] <- states[next_index]
@@ -172,6 +166,7 @@ app_server <- function(input, output, session) {
     if (compteur_verif$remaining > 0) {
       erreurs$indices <- NULL  # on vide les erreurs précédentes
 
+      # affichage d'un message quand la grille est bien ou mal complétée
       if (all(state$values == solution$values)) {
         showModal(modalDialog("Bravo, grille correcte !", easyClose = TRUE))
       } else {
