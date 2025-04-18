@@ -5,16 +5,19 @@
 #' @import shinyjs
 #' @export
 app_server <- function(input, output, session) {
+  # Format de la grille : 8x8
   nRows <- 8
   nCols <- 8
   total_buttons <- nRows * nCols
 
+  # Cases vides en fonction de la difficulté
   nb_cases_vides <- list(
-    facile = total_buttons - 64,
+    facile = total_buttons - 40,
     moyen = total_buttons - 30,
-    difficile = total_buttons - 22
+    difficile = total_buttons - 20
   )
 
+  # Etats possibles des cases : vides, 0 ou 1
   states <- c("", "0", "1")
 
   # ReactiveValues utilisées dans la suite
@@ -24,6 +27,7 @@ app_server <- function(input, output, session) {
   solution <- reactiveValues(values = NULL)
   erreurs <- reactiveValues(indices = NULL)
 
+  # Lancement de la grille en utilisant la fonction generer_grille_valide
   observeEvent(input$launch, {
     niveau <- input$diff
     grille_completee <- generer_grille_valide(nRows, nCols)
@@ -44,15 +48,17 @@ app_server <- function(input, output, session) {
     enable("verif")
   })
 
+  # Création de la grille
   output$matrice_boutons <- renderUI({
     boutons <- lapply(1:total_buttons, function(i) {
       row <- ((i - 1) %/% nCols) + 1
       col <- ((i - 1) %% nCols) + 1
 
-      # Est-ce une case erronée ?
+      # Détection des cases eronnées
       is_error <- !is.null(erreurs$indices) &&
         any(apply(erreurs$indices, 1, function(ind) all(ind == c(row, col))))
 
+      # Change la couleur en fonction
       bouton_class <- if (is_error) "btn_custom btn_error" else "btn_custom"
 
       actionButton(inputId = paste0("bouton_", i),
@@ -65,7 +71,7 @@ app_server <- function(input, output, session) {
     )
   })
 
-
+  # Au clic, passe à la valeur suivante
   lapply(1:total_buttons, function(i) {
     observeEvent(input[[paste0("bouton_", i)]], {
       row <- ((i - 1) %/% nCols) + 1
@@ -73,6 +79,7 @@ app_server <- function(input, output, session) {
       current_index <- which(states == state$values[row, col])
       next_index <- (current_index %% length(states)) + 1
       state$values[row, col] <- states[next_index]
+
       # Retirer la case des erreurs si elle a été modifiée
       if (!is.null(erreurs$indices)) {
         erreurs$indices <- erreurs$indices[!apply(erreurs$indices, 1, function(ind) all(ind == c(row, col))), , drop = FALSE]
@@ -80,9 +87,11 @@ app_server <- function(input, output, session) {
     })
   })
 
+  # Bouton help qui affiche une case aléatoire
   observeEvent(input$help, {
     if (compteur_help$remaining > 0) {
-      empty_indices <- which(state$values == "", arr.ind = TRUE)
+      empty_indices <- which(state$values == "", arr.ind = TRUE) # détection des cases encore vides
+
       if (nrow(empty_indices) > 0) {
         idx <- empty_indices[sample(1:nrow(empty_indices), 1), ]
         row <- idx[1]
@@ -103,7 +112,7 @@ app_server <- function(input, output, session) {
     }
   })
 
-    #Affichage game over
+  # Affichage grille complétée quand la grille est justement remplie
   observe({
     if (!is.null(solution$values)) {
       current <- state$values
@@ -114,7 +123,7 @@ app_server <- function(input, output, session) {
     }
   })
 
-  #Vérif
+  # Code pour le bouton de vérification de la grille
   observeEvent(input$verif, {
     if (compteur_verif$remaining > 0) {
       erreurs$indices <- NULL  # on vide les erreurs précédentes
@@ -130,6 +139,7 @@ app_server <- function(input, output, session) {
       compteur_verif$remaining <- compteur_verif$remaining - 1
       updateActionButton(session, "verif", label = paste0("Vérifier la grille (", compteur_verif$remaining, " restante)"))
 
+      # Utilisation unique
       if (compteur_verif$remaining == 0) {
         disable("verif")
       }
