@@ -2,13 +2,32 @@
 % Please edit documentation in R/app_server.R
 \name{app_server}
 \alias{app_server}
-\title{Serveur de l'app Takuzu}
+\title{Serveur de l'application Shiny pour le jeu Takuzu}
 \usage{
 app_server(input, output, session)
 }
 \value{
-La fonction serveur de Shiny
+Une fonction utilisée comme serveur dans une application Shiny.
 }
 \description{
-Serveur de l'app Takuzu
+Cette fonction définit la logique serveur de l'application Takuzu.
+Elle gère la génération des grilles, le masquage de cases selon la difficulté,
+les interactions utilisateur avec les boutons, les vérifications de grille,
+l'affichage d'aides, et la détection de réussite.
+}
+\details{
+Le jeu Takuzu est basé sur une grille binaire (0 et 1), où l'utilisateur doit
+compléter une grille selon certaines règles de placement. Cette fonction serveur :
+\itemize{
+\item Crée la grille en fonction du niveau choisi (facile, moyen, difficile).
+\item Utilise des objets \code{reactiveValues} pour suivre l'état de la grille.
+\item Gère les interactions de l'utilisateur avec chaque bouton de la grille,
+permettant de faire défiler les valeurs possibles.
+\item Permet à l'utilisateur de révéler jusqu'à 3 cases correctes avec un bouton d'aide.
+\item Autorise une vérification unique de la grille via un bouton dédié.
+\item Affiche un message de félicitations en cas de réussite.
+}
+
+La grille est générée avec la fonction \code{generer_grille_valide}, puis partiellement masquée
+avec \code{masquer_cases}.
 }

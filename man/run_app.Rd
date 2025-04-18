@@ -6,6 +6,9 @@
 \usage{
 run_app()
 }
+\value{
+L'application shiny composée du server et de l'ui définis au préalable.
+}
 \description{
 Lancer l'application Takuzu
 }
