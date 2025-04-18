@@ -11,7 +11,7 @@
 #' @export
 masquer_cases <- function(grille, nb_vide) {
   total_buttons <- length(grille)
-  indices <- sample(1:total_buttons, nb_vide)
+  indices <- sample(1:total_buttons, nb_vide) # masque des cases en fonction de nb_vide
   grille[indices] <- ""
   return(grille)
 }
