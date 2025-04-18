@@ -34,6 +34,7 @@ app_server <- function(input, output, session) {
     solution$values <- grille_completee
     grille <- masquer_cases(grille_completee, nb_cases_vides[[niveau]])
     state$values <- grille
+    state$fixed <- grille != ""
 
     erreurs$indices <- NULL #Supp les cases rouges
 
@@ -76,11 +77,14 @@ app_server <- function(input, output, session) {
     observeEvent(input[[paste0("bouton_", i)]], {
       row <- ((i - 1) %/% nCols) + 1
       col <- ((i - 1) %% nCols) + 1
+
+      # Ne rien faire si la case est fixe
+      if (!is.null(state$fixed) && state$fixed[row, col]) return()
+
       current_index <- which(states == state$values[row, col])
       next_index <- (current_index %% length(states)) + 1
       state$values[row, col] <- states[next_index]
 
-      # Retirer la case des erreurs si elle a été modifiée
       if (!is.null(erreurs$indices)) {
         erreurs$indices <- erreurs$indices[!apply(erreurs$indices, 1, function(ind) all(ind == c(row, col))), , drop = FALSE]
       }

@@ -45,6 +45,13 @@ app_ui <- function() {
         color: white !important;
         border-color: #ff6b6b !important;
       }
+      .btn-grid button:disabled {
+      background-color: #e9ecef;
+      color: #6c757d;
+      font-weight: normal;
+      border-color: #ced4da;
+      cursor: not-allowed;
+      }
     ")),
 
     titlePanel("Takuzu 8x8"),
