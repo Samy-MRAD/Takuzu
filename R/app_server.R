@@ -12,9 +12,9 @@ app_server <- function(input, output, session) {
 
   # Cases vides en fonction de la difficulté
   nb_cases_vides <- list(
-    facile = total_buttons - 40,
-    moyen = total_buttons - 30,
-    difficile = total_buttons - 20
+    facile = total_buttons - 35,
+    moyen = total_buttons - 28,
+    difficile = total_buttons - 21
   )
 
   # Etats possibles des cases : vides, 0 ou 1
@@ -27,6 +27,7 @@ app_server <- function(input, output, session) {
   solution <- reactiveValues(values = NULL)
   erreurs <- reactiveValues(indices = NULL)
   cases_fixes <- reactiveValues(indices = NULL)
+  lancement_fait <- reactiveVal(FALSE)
 
   observeEvent(input$launch, {
     niveau <- input$diff
@@ -45,6 +46,19 @@ app_server <- function(input, output, session) {
 
     # Cases fixes
     cases_fixes$indices <- which(grille != "", arr.ind = TRUE)
+
+    # modif du bouton lancer le niveau
+    if (!lancement_fait()) {
+      lancement_fait(TRUE)
+    } else {
+      updateActionButton(session, "launch", label = "Lancer un autre niveau")
+    }
+
+    # Et au premier clic, on peut aussi directement changer le label :
+    if (!lancement_fait()) {
+      lancement_fait(TRUE)
+      updateActionButton(session, "launch", label = "Lancer un autre niveau")
+    }
   })
 
   # Création de la grille
@@ -161,4 +175,5 @@ app_server <- function(input, output, session) {
       }
     }
   })
+
 }
