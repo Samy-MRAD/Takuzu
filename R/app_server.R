@@ -26,6 +26,7 @@ app_server <- function(input, output, session) {
   state <- reactiveValues(values = matrix(rep("", total_buttons), nrow = nRows, ncol = nCols))
   solution <- reactiveValues(values = NULL)
   erreurs <- reactiveValues(indices = NULL)
+  validees <- reactiveValues(indices = NULL)
   cases_fixes <- reactiveValues(indices = NULL)
   lancement_fait <- reactiveVal(FALSE)
 
@@ -37,6 +38,7 @@ app_server <- function(input, output, session) {
     state$values <- grille
 
     erreurs$indices <- NULL
+    validees$indices <- NULL
     compteur_help$remaining <- 3
     compteur_verif$remaining <- 1
     updateActionButton(session, "verif", label = "Vérifier la grille (1 restante)")
@@ -75,10 +77,20 @@ app_server <- function(input, output, session) {
       is_fixed <- !is.null(cases_fixes$indices) &&
         any(apply(cases_fixes$indices, 1, function(ind) all(ind == c(row, col))))
 
+      # Est-ce une case VALIDÉE ?
+      is_valid <- !is.null(validees$indices) &&
+        any(apply(validees$indices, 1, function(ind) all(ind == c(row, col))))
+
       # Classes CSS : ajout d'une classe spéciale si c'est une case fixe
       bouton_class <- "btn_custom"
-      if (is_error) bouton_class <- paste(bouton_class, "btn_error")
-      if (is_fixed) bouton_class <- paste(bouton_class, "btn_fixed")
+      if (is_error) {
+        bouton_class <- paste(bouton_class, "btn_error")
+      } else if (is_valid) {
+        bouton_class <- paste(bouton_class, "btn_valid")
+      }
+      if (is_fixed) {
+        bouton_class <- paste(bouton_class, "btn_fixed")
+      }
 
       actionButton(
         inputId = paste0("bouton_", i),
@@ -122,6 +134,8 @@ app_server <- function(input, output, session) {
         row <- idx[1]
         col <- idx[2]
         state$values[row, col] <- solution$values[row, col]
+        validees$indices <- rbind(validees$indices, c(row, col)) # Ajouter cette case aux cases grises
+
 
         # Si la case faisait partie des erreurs, on la retire
         if (!is.null(erreurs$indices)) {
@@ -163,6 +177,7 @@ app_server <- function(input, output, session) {
       } else {
         diff_matrix <- state$values != solution$values
         erreurs$indices <- which(diff_matrix, arr.ind = TRUE)
+        validees$indices <- which(!diff_matrix, arr.ind = TRUE)
         showModal(modalDialog("Il y a des erreurs", easyClose = TRUE))
       }
 

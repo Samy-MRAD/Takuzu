@@ -84,6 +84,13 @@ app_ui <- function() {
       border-color: #ced4da !important;
       cursor: not-allowed !important;
       }
+
+      .btn_valid {
+      background-color: #e9ecef !important;
+      color: #000000 !important;
+      border-color: #bbb !important;
+      }
+
     ")),
 
     titlePanel("Takuzu"),
