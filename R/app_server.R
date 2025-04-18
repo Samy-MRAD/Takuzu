@@ -31,6 +31,8 @@ app_server <- function(input, output, session) {
     grille <- masquer_cases(grille_completee, nb_cases_vides[[niveau]])
     state$values <- grille
 
+    erreurs$indices <- NULL #Supp les cases rouges
+
     # compteurs d'utilisations restantes pour les boutons
     compteur_help$remaining <- 3
     compteur_verif$remaining <- 1
@@ -80,6 +82,10 @@ app_server <- function(input, output, session) {
       current_index <- which(states == state$values[row, col])
       next_index <- (current_index %% length(states)) + 1
       state$values[row, col] <- states[next_index]
+      # Retirer la case des erreurs si elle a été modifiée
+      if (!is.null(erreurs$indices)) {
+        erreurs$indices <- erreurs$indices[!apply(erreurs$indices, 1, function(ind) all(ind == c(row, col))), , drop = FALSE]
+      }
     })
   })
 
@@ -106,7 +112,7 @@ app_server <- function(input, output, session) {
     }
   })
 
-  #Affichage game over
+    #Affichage game over
   observe({
     if (!is.null(solution$values)) {
       current <- state$values
@@ -117,6 +123,7 @@ app_server <- function(input, output, session) {
     }
   })
 
+  #Vérif
   observeEvent(input$verif, {
     if (compteur_verif$remaining > 0) {
       erreurs$indices <- NULL  # on vide les erreurs précédentes
