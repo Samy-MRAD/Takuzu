@@ -24,7 +24,7 @@ Pour remplir la grille, le joueur doit suivre les règles suivantes :
 Lancez la commande suivante dans un terminal :
 
 ```bash
-git clone https://github.com/nom-utilisateur/takuzu.git
+git clone https://github.com/Samy-MRAD/Takuzu.git
 ```
 
 2. Ouvrir le dossier du package dans RStudio (ouvrir le fichier `Takuzu.Rproj` si présent, ou bien ouvrir le dossier comme projet RStudio).
