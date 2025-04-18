@@ -109,6 +109,11 @@ app_server <- function(input, output, session) {
         col <- idx[2]
         state$values[row, col] <- solution$values[row, col]
 
+        # Si la case faisait partie des erreurs, on la retire
+        if (!is.null(erreurs$indices)) {
+          erreurs$indices <- erreurs$indices[!apply(erreurs$indices, 1, function(ind) all(ind == c(row, col))), , drop = FALSE]
+        }
+
         compteur_help$remaining <- compteur_help$remaining - 1
 
         # Met à jour le label avec le nombre d'utilisations restantes
