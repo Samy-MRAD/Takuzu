@@ -11,10 +11,13 @@
 #'
 #' @export
 generer_grille_valide <- function(nRows, nCols, max_essais = 1000) {
+
+  # Boucle : on retente 1000 fois jusqu'à obtenir une grille valide
   for (essai in 1:max_essais) {
     grille <- matrix("", nrow = nRows, ncol = nCols)
-    ligne_ok <- TRUE
+    ligne_ok <- TRUE # pour suivre la validité de la grille
 
+    # Construction ligne par ligne
     for (i in 1:nRows) {
       zeros <- 0
       ones <- 0
@@ -41,17 +44,19 @@ generer_grille_valide <- function(nRows, nCols, max_essais = 1000) {
           possible_values <- setdiff(possible_values, "1")
         }
 
+        # Si aucune valeur possible, on abandonne cette tentative
         if (length(possible_values) == 0) {
           ligne_ok <- FALSE
           break
         }
 
+        # Choix aléatoire parmi les possibilités restantes
         ligne[j] <- sample(possible_values, 1)
         if (ligne[j] == "0") zeros <- zeros + 1
         if (ligne[j] == "1") ones <- ones + 1
       }
 
-      if (!ligne_ok) break
+      if (!ligne_ok) break # Si la ligne est invalide, on stop la tentative
 
       # Vérification unicité de la ligne
       if (i > 1) {
