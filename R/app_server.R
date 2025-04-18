@@ -26,27 +26,25 @@ app_server <- function(input, output, session) {
   state <- reactiveValues(values = matrix(rep("", total_buttons), nrow = nRows, ncol = nCols))
   solution <- reactiveValues(values = NULL)
   erreurs <- reactiveValues(indices = NULL)
+  cases_fixes <- reactiveValues(indices = NULL)
 
-  # Lancement de la grille en utilisant la fonction generer_grille_valide
   observeEvent(input$launch, {
     niveau <- input$diff
     grille_completee <- generer_grille_valide(nRows, nCols)
     solution$values <- grille_completee
     grille <- masquer_cases(grille_completee, nb_cases_vides[[niveau]])
     state$values <- grille
-    state$fixed <- grille != ""
 
-    erreurs$indices <- NULL #Supp les cases rouges
-
-    # compteurs d'utilisations restantes pour les boutons
+    erreurs$indices <- NULL
     compteur_help$remaining <- 3
     compteur_verif$remaining <- 1
     updateActionButton(session, "verif", label = "Vérifier la grille (1 restante)")
     updateActionButton(session, "help", label = "Révéler une case (3 restantes)")
-
-    # Activer le bouton "Révéler une case" après le lancement du niveau
     enable("help")
     enable("verif")
+
+    # Cases fixes
+    cases_fixes$indices <- which(grille != "", arr.ind = TRUE)
   })
 
   # Création de la grille
@@ -55,23 +53,32 @@ app_server <- function(input, output, session) {
       row <- ((i - 1) %/% nCols) + 1
       col <- ((i - 1) %% nCols) + 1
 
-      # Détection des cases eronnées
+      # Erreur ?
       is_error <- !is.null(erreurs$indices) &&
         any(apply(erreurs$indices, 1, function(ind) all(ind == c(row, col))))
 
-      # Change la couleur en fonction
-      bouton_class <- if (is_error) "btn_custom btn_error" else "btn_custom"
+      # Est-ce une case FIXE (affichée dès le début) ?
+      is_fixed <- !is.null(cases_fixes$indices) &&
+        any(apply(cases_fixes$indices, 1, function(ind) all(ind == c(row, col))))
 
-      actionButton(inputId = paste0("bouton_", i),
-                   label = state$values[row, col],
-                   class = bouton_class)
+      # Classes CSS : ajout d'une classe spéciale si c'est une case fixe
+      bouton_class <- "btn_custom"
+      if (is_error) bouton_class <- paste(bouton_class, "btn_error")
+      if (is_fixed) bouton_class <- paste(bouton_class, "btn_fixed")
+
+      actionButton(
+        inputId = paste0("bouton_", i),
+        label = state$values[row, col],
+        class = bouton_class,
+        disabled = is_fixed
+      )
     })
+
     div(
       class = "btn-grid",
       boutons
     )
   })
-
   # Au clic, passe à la valeur suivante
   lapply(1:total_buttons, function(i) {
     observeEvent(input[[paste0("bouton_", i)]], {

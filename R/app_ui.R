@@ -45,12 +45,12 @@ app_ui <- function() {
         color: white !important;
         border-color: #ff6b6b !important;
       }
-      .btn-grid button:disabled {
-      background-color: #e9ecef;
-      color: #6c757d;
+      .btn_fixed {
+      background-color: #e9ecef !important;
+      color: #000000 !important;
       font-weight: normal;
-      border-color: #ced4da;
-      cursor: not-allowed;
+      border-color: #ced4da !important;
+      cursor: not-allowed !important;
       }
     ")),
 
